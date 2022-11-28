@@ -129,7 +129,7 @@ def updateError():
     
     win.after(500,updateError)
 
-def Motor_status():
+def motorStatus():
     precti = instrument.read_register(0x2101)
     
     if precti == 1280 or precti == 1304:
@@ -150,7 +150,7 @@ def Motor_status():
     elif precti == 1281 or precti == 1305:
         statusHodnota['text'] = "Motor stopping right now"
     
-    win.after(500, Motor_status)
+    win.after(500, motorStatus)
 
 #nastaveni slideru
 frekvence = Scale(win,from_= 0,to=400,orient=HORIZONTAL,length=600, command=Frekvence)
@@ -193,8 +193,10 @@ motor.place(x=450, y=150)
 statusHodnota = Label(win)
 statusHodnota.place(x=550, y=150)
 
+instrument.write_register(0x2001, 0, functioncode=6) #setting 0 zero frequency a start program
+instrument.write_register(0x2000, 0b01, functioncode=6) # set stop command at start program
 updateProud()
 updateFrekvence()
 updateError()
-Motor_status()
+motorStatus()
 win.mainloop()

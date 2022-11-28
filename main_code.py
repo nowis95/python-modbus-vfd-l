@@ -24,6 +24,15 @@ def Start_button():
 def Stop_button():
     instrument.write_register(0x2000, 0b01, functioncode=6)
 
+def Reset_button():
+    instrument.write_register(0x2002, 0b10, functioncode=6)
+
+def Rev_button():
+    instrument.write_register(0x2000, 0b100000, functioncode=6)
+
+def Fwd_button():
+    instrument.write_register(0x2000, 0b10000, functioncode=6)
+
 def Frekvence(udalost):
     para = frekvence.get() * 100
     instrument.write_register(0x2001, para , functioncode=6)
@@ -120,6 +129,29 @@ def updateError():
     
     win.after(500,updateError)
 
+def Motor_status():
+    precti = instrument.read_register(0x2101)
+    
+    if precti == 1280 or precti == 1304:
+        statusHodnota['text'] = "Motor Stopped"
+    
+    elif precti == 1283:
+        statusHodnota['text'] = "Motor Running with FWD direction"
+
+    elif precti == 1307:
+        statusHodnota['text'] = "Motor running with REV direction"
+
+    elif precti == 1291:
+        statusHodnota['text'] = "Motor changing direction to the FWD"
+
+    elif precti == 1299:
+        statusHodnota['text'] = "Motor changing direction to the REV"
+
+    elif precti == 1281 or precti == 1305:
+        statusHodnota['text'] = "Motor stopping right now"
+    
+    win.after(500, Motor_status)
+
 #nastaveni slideru
 frekvence = Scale(win,from_= 0,to=400,orient=HORIZONTAL,length=600, command=Frekvence)
 frekvence.place(x= 212,y=368)
@@ -132,8 +164,14 @@ stop = Button(win,bg="red",text="STOP", command= Stop_button)
 stop.place(x=512,y=450)
 
 #reset tlacitko
-reset = Button(win,bg="yellow",text="RESET")
+reset = Button(win,bg="yellow",text="RESET", command= Reset_button)
 reset.place(x=760,y=450)
+
+fwd = Button(win, bg="grey", text="FWD", command=Fwd_button)
+fwd.place(x=212, y=500)
+
+rev = Button(win, bg="grey", text="REV", command=Rev_button)
+rev.place(x=212, y=550)
 
 proud = Label(win,text="Proud:")
 proud.place(x=185,y= 50 )
@@ -150,7 +188,13 @@ error.place(x=185,y= 150 )
 errorHodnota = Label(win)
 errorHodnota.place(x=260,y=150)
 
+motor = Label(win, text= "Motor status:")
+motor.place(x=450, y=150)
+statusHodnota = Label(win)
+statusHodnota.place(x=550, y=150)
+
 updateProud()
 updateFrekvence()
 updateError()
+Motor_status()
 win.mainloop()

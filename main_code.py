@@ -193,8 +193,7 @@ motor.place(x=450, y=150)
 statusHodnota = Label(win)
 statusHodnota.place(x=550, y=150)
 
-instrument.write_register(0x2001, 0, functioncode=6) #setting 0 zero frequency a start program
-instrument.write_register(0x2000, 0b01, functioncode=6) # set stop command at start program
+frekvence.set(instrument.read_register(0x2102)/100)
 updateProud()
 updateFrekvence()
 updateError()

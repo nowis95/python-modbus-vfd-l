@@ -29,9 +29,11 @@ def Reset_button():
 
 def Rev_button():
     instrument.write_register(0x2000, 0b100000, functioncode=6)
+    revGreen()
 
 def Fwd_button():
     instrument.write_register(0x2000, 0b10000, functioncode=6)
+    fwdGreen()
 
 def Frekvence(udalost):
     para = frekvence.get() * 100
@@ -132,14 +134,21 @@ def updateError():
 def motorStatus():
     precti = instrument.read_register(0x2101)
     
-    if precti == 1280 or precti == 1304:
+    if precti == 1280:
         statusHodnota['text'] = "Motor Stopped"
+        fwdGreen()
+
+    elif  precti == 1304:
+        statusHodnota['text'] = "Motor Stopped"
+        revGreen()
     
     elif precti == 1283:
         statusHodnota['text'] = "Motor Running with FWD direction"
+        fwdGreen()
 
     elif precti == 1307:
         statusHodnota['text'] = "Motor running with REV direction"
+        revGreen()
 
     elif precti == 1291:
         statusHodnota['text'] = "Motor changing direction to the FWD"
@@ -151,6 +160,14 @@ def motorStatus():
         statusHodnota['text'] = "Motor stopping right now"
     
     win.after(500, motorStatus)
+
+def revGreen():
+    fwd.config(bg="grey")
+    rev.config(bg="green")
+
+def fwdGreen():
+    fwd.config(bg="green")
+    rev.config(bg="grey")
 
 #nastaveni slideru
 frekvence = Scale(win,from_= 0,to=400,orient=HORIZONTAL,length=600, command=Frekvence)
